@@ -45,7 +45,8 @@ public:
   LedHelix();
   ~LedHelix();
 
-  void pointToDirection(int angleInDegrees);
+  void clearColors();
+  void pointToDirectionWithColor(int angleInDegrees, rgb_color rgbColor);
   void updateLeds();
 
 private:

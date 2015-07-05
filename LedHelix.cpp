@@ -31,39 +31,55 @@
 
 #include <avr/pgmspace.h>
 
-// segment 1 = 0..36 (37 leds)
-// segment 2 = 37..72 (36 leds)
-// segment 3 = 73..110 (38 leds)
-// segment 4 = 111..143 (33 leds)
-// total 144 leds
-
-// TODO: Calculate mapping for helix.
+/*
+ * The LED strip helix has been wound on a cylinder with diameter of 79.58mm with nearly
+ * four complete turns in clockwise downwards direction. The last not 360° complete turn 
+ * had a circular arc length of 212mm measured relative from the first LED. The LED strip
+ * consists of 144 individually addressable light sources with RGB colors. It is assumed
+ * that the first addressable LED on the top of the cylinder marks the relative 0° of the 
+ * entire LED strip.
+ * 
+ * To calculate the LED mapping following formulas were used:
+ * 
+ * Total circular arc degrees:
+ * alphaComplete = 3*360°
+ *               = 1080°
+ * alphaRemainder = (lengthCircularArc * 360°) / (diameter * Pi)
+ *                = (212mm * 360°) / (79.58mm * Pi)
+ *                = 305.27°
+ * alphaCircularArc = alphaComplete + alphaRemainder
+ *                  = 1080° + 305.27°
+ *                  = 1385.27°
+ * The circular arc degrees were linearly distributed for the 144 LEDs which resulted in
+ * following to an integer value rounded LED_MAP array. The array is stored in the program
+ * memory (PROGMEM) instead of the RAM to save memory space.
+ */
 static const int LED_MAP[LedHelix::LED_COUNT] PROGMEM = {
-  0,101,201,302,403,503,604,705,806,906,1007,1108,1208,1309,1410,1510,1611,1712,1813,1913,
-  2014,2115,2215,2316,2417,2517,2618,2719,2820,2920,3021,3122,3222,3323,3424,3524,3625,
-  3726,3827,3927,4028,4129,4229,4330,4431,4531,4632,4733,4834,4934,5035,5136,5236,5337,
-  5438,5538,5639,5740,5841,5941,6042,6143,6243,6344,6445,6545,6646,6747,6848,6948,7049,
-  7150,7250,7351,7452,7552,7653,7754,7855,7955,8056,8157,8257,8358,8459,8559,8660,8761,
-  8862,8962,9063,9164,9264,9365,9466,9566,9667,9768,9869,9969,10070,10171,10271,10372,
-  10473,10573,10674,10775,10876,10976,11077,11178,11278,11379,11480,11580,11681,11782,
-  11882,11983,12084,12185,12285,12386,12487,12587,12688,12789,12889,12990,13091,13192,
-  13292,13393,13494,13594,13695,13796,13896,13997,14098,14199,14299,14400
+  0,10,19,29,39,48,58,68,77,87,97,107,116,126,136,145,155,165,174,184,194,203,213,223,232,
+  242,252,262,271,281,291,300,310,320,329,339,349,358,368,378,387,397,407,417,426,436,446,
+  455,465,475,484,494,504,513,523,533,542,552,562,572,581,591,601,610,620,630,639,649,659,
+  668,678,688,697,707,717,727,736,746,756,765,775,785,794,804,814,823,833,843,852,862,872,
+  882,891,901,911,920,930,940,949,959,969,978,988,998,1007,1017,1027,1037,1046,1056,1066,
+  1075,1085,1095,1104,1114,1124,1133,1143,1153,1162,1172,1182,1192,1201,1211,1221,1230,
+  1240,1250,1259,1269,1279,1288,1298,1308,1317,1327,1337,1347,1356,1366,1376,1385
 };
 
 LedHelix::LedHelix() {
+  clearColors();
+}
+
+LedHelix::~LedHelix() { }
+
+void LedHelix::clearColors() {
   for(int i=0; i<LED_COUNT; i++) {
     rgbColors[i] = (rgb_color){ 0, 0, 0 };
   }
 }
 
-LedHelix::~LedHelix() { }
-
-void LedHelix::pointToDirection(int angleInDegrees) {
-  const rgb_color red = (rgb_color){ 32, 0, 0 };
-  int angle = angleInDegrees*10;
-  for(int i=0,segment=1; i<LED_COUNT; i++) {
-    if(LED_MAP[i] >= angle*segment) {
-      rgbColors[i] = red;
+void LedHelix::pointToDirectionWithColor(int angleInDegrees, rgb_color rgbColor) {
+  for(int i=0,segment=0; i<LED_COUNT; i++) {
+    if(pgm_read_word(&LED_MAP[i]) >= (360*segment + angleInDegrees)) {
+      rgbColors[i] = rgbColor;
       segment++;
     }
   }

@@ -3,11 +3,9 @@
 
 Timer timer;
 LedHelix ledHelix;
-rgb_color * rgbColors = ledHelix.rgbColors;
+int angle = 0;
 
 static const unsigned char LED_ACTIVITY = 13;
-static const unsigned char LED_COUNT = LedHelix::LED_COUNT;
-static const unsigned char LED_SEGMENT_COUNT = LED_COUNT/4;
 
 void toggleLedActivity() {
   digitalWrite(LED_ACTIVITY, !digitalRead(LED_ACTIVITY));
@@ -18,19 +16,14 @@ void refreshPololuLedStrip() {
 }
 
 void rotatePololuLedStrip() {
-  rgb_color temp = rgbColors[LED_COUNT-1];
-  for(int i=LED_COUNT-2; i>=0; i--) {
-    rgbColors[i+1] = rgbColors[i];
-  }
-  rgbColors[0] = temp;
+  ledHelix.clearColors();
+  ledHelix.pointToDirectionWithColor(angle, (rgb_color) {255,0,0});
+  angle += 5;
+  angle %= 360;
 }
 
 void setup() {
   // put your setup code here, to run once:
-  
-  for(int i=0; i<LED_COUNT; i+=LED_SEGMENT_COUNT) {
-    rgbColors[i] = (rgb_color){ 32, 0, 0 };
-  }
   
   pinMode(LED_ACTIVITY, OUTPUT);
   
