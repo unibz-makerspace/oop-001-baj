@@ -64,6 +64,10 @@ static const int LED_MAP[LedHelix::LED_COUNT] PROGMEM = {
   1240,1250,1259,1269,1279,1288,1298,1308,1317,1327,1337,1347,1356,1366,1376,1385
 };
 
+/* Common used colors. */
+static const rgb_color COLOR_RED = (rgb_color){255,0,0};
+static const rgb_color COLOR_WHITE = (rgb_color){255,255,255};
+
 LedHelix::LedHelix() {
   clearColors();
 }
@@ -83,6 +87,11 @@ void LedHelix::pointToDirectionWithColor(int angleInDegrees, rgb_color rgbColor)
       segment++;
     }
   }
+}
+
+void LedHelix::pointCompassToDirection(int angleInDegrees) {
+  pointToDirectionWithColor(angleInDegrees, COLOR_RED);
+  pointToDirectionWithColor(((angleInDegrees + 180) % 360), COLOR_WHITE);
 }
 
 void LedHelix::updateLeds() {

@@ -11,14 +11,11 @@ void toggleLedActivity() {
   digitalWrite(LED_ACTIVITY, !digitalRead(LED_ACTIVITY));
 }
 
-void refreshPololuLedStrip() {
-  ledHelix.updateLeds();
-}
-
-void rotatePololuLedStrip() {
+void updatePololuLedStrip() {
   ledHelix.clearColors();
-  ledHelix.pointToDirectionWithColor(angle, (rgb_color) {255,0,0});
-  angle += 5;
+  ledHelix.pointCompassToDirection(angle);
+  ledHelix.updateLeds();
+  angle += 9;
   angle %= 360;
 }
 
@@ -28,8 +25,7 @@ void setup() {
   pinMode(LED_ACTIVITY, OUTPUT);
   
   timer.setInterval(toggleLedActivity, 1000);
-  timer.setInterval(refreshPololuLedStrip, 50); // 20fps.
-  timer.setInterval(rotatePololuLedStrip, 50);
+  timer.setInterval(updatePololuLedStrip, 40); // 25fps.
 }
 
 void loop() {

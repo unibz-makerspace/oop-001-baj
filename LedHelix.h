@@ -45,8 +45,27 @@ public:
   LedHelix();
   ~LedHelix();
 
+  /*
+   * Clears all lights of the helix LED strip.
+   */
   void clearColors();
+
+  /*
+   * Displays a vertical bar of given color on the helix LED strip.
+   */
   void pointToDirectionWithColor(int angleInDegrees, rgb_color rgbColor);
+
+  /*
+   * Displays a compass like bar on the helix LED strip.
+   * A red bar shows to the angle as in the parameter angleInDegrees.
+   * A white bar shows to the 180° degree out of phase direction of the prameter
+   * angleInDegrees.
+   */
+  void pointCompassToDirection(int angleInDegrees);
+
+  /*
+   * Writes the internal buffer to the helix LED strip.
+   */
   void updateLeds();
 
 private:
