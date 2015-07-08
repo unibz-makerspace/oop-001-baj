@@ -53,7 +53,7 @@ public:
   /*
    * Displays a vertical bar of given color on the helix LED strip.
    */
-  void pointToDirectionWithColor(int angleInDegrees, rgb_color rgbColor);
+  void pointToDirectionWithColor(unsigned int angleInDegrees, rgb_color rgbColor);
 
   /*
    * Displays a compass like bar on the helix LED strip.
@@ -61,7 +61,11 @@ public:
    * A white bar shows to the 180° degree out of phase direction of the prameter
    * angleInDegrees.
    */
-  void pointCompassToDirection(int angleInDegrees);
+  void pointCompassToDirection(unsigned int angleInDegrees);
+
+  void drawOnAngleWithColor(unsigned int angleInDegrees, rgb_color rgbColor);
+  void drawCharacterAtDirectionWithColor(
+      char character, unsigned int angleInDegrees, rgb_color rgbColor);
 
   /*
    * Writes the internal buffer to the helix LED strip.
