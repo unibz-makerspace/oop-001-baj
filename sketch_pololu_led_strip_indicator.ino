@@ -11,6 +11,8 @@
 Timer timer;
 LedHelix ledHelix;
 Adafruit_LSM9DS0 inertialModule = Adafruit_LSM9DS0();
+bool invertMagneticX = false;
+bool invertMagneticY = false; 
 
 /*int angle = 90;
 char c = '!';*/
@@ -21,10 +23,52 @@ void toggleLedActivity() {
   digitalWrite(LED_ACTIVITY, !digitalRead(LED_ACTIVITY));
 }
 
+typedef struct {
+  int x;
+  int y;
+  int z;
+} InertialModule;
+
+typedef struct {
+  float x;
+  float y;
+} Tuple;
+
 unsigned int handleInertialModuleCompass() {
   inertialModule.read();
-  double heading = 180.0*atan2(inertialModule.magData.x, inertialModule.magData.y)/3.14;
-  heading = (heading < 0) ? heading + 360.0 : heading;
+  InertialModule magnetic = (InertialModule) {
+    (invertMagneticX) ? -(int)inertialModule.magData.x : (int)inertialModule.magData.x,
+    (invertMagneticX) ? -(int)inertialModule.magData.y : (int)inertialModule.magData.y,
+    (int)inertialModule.magData.z
+  };
+  InertialModule acceleration = (InertialModule) {
+    (int)inertialModule.accelData.x,
+    (int)inertialModule.accelData.y,
+    (int)inertialModule.accelData.z
+  };
+  /*
+  float heading = 180 * atan2(magnetic.x, magnetic.y) / M_PI;
+  heading = (heading < 0) ? heading + 360 : heading;
+  return (unsigned int) heading;
+  */
+  Tuple accelerationNormalized = (Tuple) {
+    (float)(acceleration.x / sqrt(
+        pow(acceleration.x, 2) +
+        pow(acceleration.y, 2) +
+        pow(acceleration.z, 2))),
+    (float)(acceleration.y / sqrt(
+        pow(acceleration.x, 2) +
+        pow(acceleration.y, 2) +
+        pow(acceleration.z, 2)))
+  };
+  float pitch = asin(accelerationNormalized.x);
+  float roll = -asin(accelerationNormalized.y / cos(pitch));
+  Tuple magneticCompensated = (Tuple) {
+    (float)(magnetic.x * cos(pitch) + magnetic.z * sin(pitch)),
+    (float)(magnetic.x * sin(roll) * sin(pitch) + magnetic.y * cos(roll) - magnetic.z * sin(roll) * cos(pitch))
+  };
+  float heading = 180 * atan2(magneticCompensated.x, magneticCompensated.y) / M_PI;
+  heading = (heading < 0) ? heading + 360 : heading;
   return (unsigned int) heading;
 }
 
@@ -58,8 +102,8 @@ void updatePololuLedStrip() {
 
 void setupInertialModule() {
   if(inertialModule.begin()) {
-    inertialModule.setupMag(inertialModule.LSM9DS0_MAGGAIN_12GAUSS);
-    inertialModule.setupAccel(inertialModule.LSM9DS0_ACCELRANGE_16G);
+    inertialModule.setupMag(Adafruit_LSM9DS0::LSM9DS0_MAGGAIN_12GAUSS);
+    inertialModule.setupAccel(Adafruit_LSM9DS0::LSM9DS0_ACCELRANGE_16G);
   } else {
     abort();
   }
