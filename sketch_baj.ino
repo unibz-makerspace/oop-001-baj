@@ -13,7 +13,7 @@
 static const unsigned char LED_ACTIVITY = 13;
 static const bool INVERT_MAGNETIC_X = false;
 static const bool INVERT_MAGNETIC_Y = false; 
-static const Mode MODE = MODE_COMPASS;
+static const Mode MODE = MODE_ASCII;
 
 Timer timer;
 
@@ -23,14 +23,14 @@ LedHelix ledHelix;
 // Inertial Module.
 Adafruit_LSM9DS0 inertialModule = Adafruit_LSM9DS0();
 
-int angle = 90;
-char c = '!';
+int angle = 0; //90;
+char c = 'A';
 
 void setup() {
   // put your setup code here, to run once:
 
   //Serial.begin(115200);
-  
+
   pinMode(LED_ACTIVITY, OUTPUT);
   
   timer.setInterval(toggleLedActivity, 1000);
@@ -58,7 +58,7 @@ void updatePololuLedStrip() {
       ledHelix.clearColors();
       ledHelix.pointCompassToDirection(angle);
       ledHelix.updateLeds();
-      angle += 9;
+      angle += ledHelix.ANGLE_RESOLUTION;
       angle %= 360;
       break;
     case MODE_COMPASS:
@@ -68,18 +68,17 @@ void updatePololuLedStrip() {
       break;
     case MODE_ASCII:
       ledHelix.clearColors();
-      //ledHelix.drawCharacterAtDirectionWithColor(c, angle, (rgb_color){255,0,0});
-      ledHelix.drawCharacterAtDirectionWithColor('W', angle, (rgb_color){255,0,0});
+      ledHelix.drawCharacterAtDirectionWithColor(c, angle, (rgb_color){255,0,0});
+      //ledHelix.drawCharacterAtDirectionWithColor('W', angle, (rgb_color){255,0,0});
       ledHelix.updateLeds();
-      angle += 9;
+      angle += ledHelix.ANGLE_RESOLUTION;
       if(angle >= 360) {
-        angle = 30;
+        angle = 0;
         c++;
-        if(c > '~') {
-          c = '!';
+        if(c > 'S') {
+          c = 'A';
         }
       }
-      angle %= 360;
       break;
     default:
       abort();

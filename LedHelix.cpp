@@ -68,35 +68,12 @@ static const uint16_t LED_MAP[LedHelix::LED_COUNT] PROGMEM = {
   1288u,1298u,1308u,1317u,1327u,1337u,1347u,1356u,1366u,1376u,1385u
 };
 
-/*
- * 4x4 pixel ASCII character font map.
- */
-static const char ASCII_OFFSET = 32;
-static const char ASCII_LENGTH = 96;
-static const uint16_t FONT_MAP_4X4[ASCII_LENGTH] PROGMEM = {
-  0x0000u/* */,0x4404u/*!*/,0xAA00u/*"*/,0xAEEAu/*#*/,0x46C4u/*$*/,0xA48Au/*%*/,
-  0x486Au/*&*/,0x4400u/*'*/,0x4884u/*(*/,0x4224u/*)*/,0x4EA0u/***/,0x04E4u/*+*/,
-  0x0048u/*,*/,0x00E0u/*-*/,0x0004u/*.*/,0x2448u/*/*/,0xEAAEu/*0*/,0x4C4Eu/*1*/,
-  0xC24Eu/*2*/,0xC26Cu/*3*/,0xAAE2u/*4*/,0xEC2Cu/*5*/,0x6CA4u/*6*/,0xE244u/*7*/,
-  0x4AE4u/*8*/,0x4A6Cu/*9*/,0x0404u/*:*/,0x4048u/*;*/,0x0686u/*<*/,0x0E0Eu/*=*/,
-  0x0C2Cu/*>*/,0xC244u/*?*/,0x4E84u/*@*/,0x4AEAu/*A*/,0xCAECu/*B*/,0x6886u/*C*/,
-  0xCAACu/*D*/,0xE8CEu/*E*/,0xE8C8u/*F*/,0x68A6u/*G*/,0xAAEAu/*H*/,0xE44Eu/*I*/,
-  0xE22Cu/*J*/,0xACCAu/*K*/,0x888Eu/*L*/,0xEEAAu/*M*/,0xAEEAu/*N*/,0x4AA4u/*O*/,
-  0xCAC8u/*P*/,0x4AA6u/*Q*/,0xCACAu/*R*/,0x6C6Cu/*S*/,0xE444u/*T*/,0xAAAEu/*U*/,
-  0xAAA4u/*V*/,0xAAEEu/*W*/,0xA44Au/*X*/,0xAA44u/*Y*/,0xE24Eu/*Z*/,0xC88Cu/*[*/,
-  0x8442u/*\*/,0x6226u/*]*/,0x4A00u/*^*/,0x000Eu/*_*/,0x8400u/*`*/,0x04A6u/*a*/,
-  0x8CACu/*b*/,0x0686u/*c*/,0x26A6u/*d*/,0x0E86u/*e*/,0x68C8u/*f*/,0x4A6Cu/*g*/,
-  0x8CAAu/*h*/,0x4044u/*i*/,0x4048u/*j*/,0x8ACAu/*k*/,0x8884u/*l*/,0x0CEAu/*m*/,
-  0x0CAAu/*n*/,0x04A4u/*o*/,0xCAC8u/*p*/,0x6A62u/*q*/,0x0C88u/*r*/,0x0426u/*s*/,
-  0x4E46u/*t*/,0x0AAEu/*u*/,0x0AA4u/*v*/,0x0AEEu/*w*/,0x0A4Au/*x*/,0xAA6Cu/*y*/,
-  0x0E4Eu/*z*/,0x6486u/*{*/,0x4444u/*|*/,0xC42Cu/*}*/,0x6C00u/*~*/,0x0000u/* */,
-};
-
 /* Common used colors. */
 static const rgb_color COLOR_RED = (rgb_color){255,0,0};
 static const rgb_color COLOR_WHITE = (rgb_color){255,255,255};
 
-LedHelix::LedHelix() {
+LedHelix::LedHelix()
+    : ANGLE_RESOLUTION((unsigned char)((LED_MAP[LED_COUNT-1])/LED_COUNT)) {
   clearColors();
 }
 
@@ -133,7 +110,6 @@ void LedHelix::drawOnAngleWithColor(unsigned int angleInDegrees, rgb_color rgbCo
 
 void LedHelix::drawCharacterAtDirectionWithColor(
     char character, unsigned int angleInDegrees, rgb_color rgbColor) {
-  //Serial.println(character);
   const Font font = Font_BAJ;
   const char characterIndex = character - font.characterStartOffset;
   if((characterIndex < 0) || (characterIndex >= font.characterCount)) {
@@ -141,21 +117,16 @@ void LedHelix::drawCharacterAtDirectionWithColor(
   }
   const uint8_t characterHeight = font.characterHeight;
   const uint8_t characterWidth = pgm_read_byte(&font.characterWidths[characterIndex]);
-  //uint16_t angle = 360;
   for(uint_fast8_t i=0; i<characterHeight; i++) {
     const uint16_t mappingIndex = 4*characterIndex + i;
     uint16_t characterMapping = pgm_read_word(&font.characterMappings[mappingIndex]);
     for(uint_fast8_t j=0; j<characterWidth; j++) {
-      unsigned int angle = angleInDegrees - 10*j + 360*i;
+      unsigned int angle = angleInDegrees - j*ANGLE_RESOLUTION + 360*i;
       if((characterMapping & 0x8000) != 0) {
-        //Serial.print('#');
         drawOnAngleWithColor(angle, rgbColor);
-      } else {
-        //Serial.print('O');
       }
       characterMapping <<= 1;
     }
-    //Serial.println();
   }
 }
 

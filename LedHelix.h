@@ -41,6 +41,8 @@ public:
   const static unsigned char LED_COUNT = 144;
 
   rgb_color rgbColors[LED_COUNT];
+
+  const unsigned char ANGLE_RESOLUTION;
   
   LedHelix();
   ~LedHelix();
