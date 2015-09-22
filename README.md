@@ -16,4 +16,7 @@ It demonstrates how product design, 3D printing, electronics, and software devel
 
 This project has been developed for demonstration purposes only, but it may be extended for future needs.
 
+## Info
+Set this folder as the root of your sketch book in the Arduino IDE settings.
+
 16/07/2015 - Julian Sanin - Free University of Bolzano/Bozen

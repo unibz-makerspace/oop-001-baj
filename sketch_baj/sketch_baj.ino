@@ -1,10 +1,14 @@
 #include "Timer.h"
+
+#include <PololuLedStrip.h>
 #include "LedHelix.h"
+
 #include "sketch_baj.h"
 
 #include <SPI.h>
 #include <Wire.h>
-#include "Adafruit_LSM9DS0.h"
+#include <Adafruit_Sensor.h>
+#include <Adafruit_LSM9DS0.h>
 
 #include <stdlib.h>
 #include <math.h>

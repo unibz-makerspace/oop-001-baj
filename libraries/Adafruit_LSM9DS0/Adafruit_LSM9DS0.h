@@ -16,13 +16,13 @@
 #define __LSM9DS0_H__
 
 #if (ARDUINO >= 100)
- #include <Arduino.h>
+ #include "Arduino.h"
 #else
- #include <WProgram.h>
+ #include "WProgram.h"
 #endif
-#include <Wire.h>
+#include "Wire.h"
 #include <SPI.h>
-#include "Adafruit_Sensor.h"
+#include <Adafruit_Sensor.h>
 
 #define LSM9DS0_ADDRESS_ACCELMAG           (0x1D)         // 3B >> 1 = 7bit default
 #define LSM9DS0_ADDRESS_GYRO               (0x6B)         // D6 >> 1 = 7bit default

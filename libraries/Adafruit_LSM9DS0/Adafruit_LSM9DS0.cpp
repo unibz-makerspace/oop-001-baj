@@ -12,7 +12,7 @@
   Written by Kevin Townsend for Adafruit Industries.  
   BSD license, all text above must be included in any redistribution
  ***************************************************************************/
-#include "Adafruit_LSM9DS0.h"
+#include <Adafruit_LSM9DS0.h>
 
 /***************************************************************************
  CONSTRUCTOR
@@ -443,7 +443,7 @@ uint8_t Adafruit_LSM9DS0::spixfer(uint8_t data) {
       digitalWrite(_mosi, data & (1<<i));
       digitalWrite(_clk, HIGH);
       if (digitalRead(_miso)) 
-  reply |= 1;
+	reply |= 1;
     }
     return reply;
   }

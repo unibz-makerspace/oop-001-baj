@@ -32,7 +32,7 @@
 
 #include <Arduino.h>
 
-#include "PololuLedStrip.h"
+#include <PololuLedStrip.h>
 
 class LedHelix {
 
